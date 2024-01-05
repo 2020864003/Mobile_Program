@@ -1,0 +1,298 @@
+--------------------------
+005_인텐트 (실습: 알고리즘학습모임)
+--------------------------
+public class MainActivity extends AppCompatActivity {
+    Button button_register;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        button_register=findViewById(R.id.button_register);
+        button_register.setOnClickListener((v)->{
+            Intent intent=new Intent(getApplicationContext(), RegisterActivity.class);
+            startActivity(intent);
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알고리즘\n학습모임"
+        android:textSize="40sp"
+        android:padding="20dp"/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:hint="   아이디   "/>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:inputType="textPassword"
+        android:hint="  패스워드  "/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_margin="10dp"
+            android:text="로그인"/>
+        <Button
+            android:id="@+id/button_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_margin="10dp"
+            android:text="회원가입"/>
+    </LinearLayout>
+</LinearLayout>
+
+
+public class RegisterActivity extends AppCompatActivity {
+    EditText edittext_id, edittext_password, edittext_password2, edittext_email;
+    Button button_confirm;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+        edittext_id=findViewById(R.id.edittext_id);
+        edittext_password=findViewById(R.id.edittext_password);
+        edittext_password2=findViewById(R.id.edittext_password2);
+        edittext_email=findViewById(R.id.edittext_email);
+        button_confirm=findViewById(R.id.button_confirm);
+
+        button_confirm.setOnClickListener(v->{
+            Intent intent=new Intent(getApplicationContext(), ConfirmActivity.class);
+            intent.putExtra("ID", edittext_id.getText().toString());
+            intent.putExtra("PASSWORD", edittext_password.getText().toString());
+            intent.putExtra("EMAIL", edittext_email.getText().toString());
+            startActivity(intent);
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="40dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20sp"
+        android:text="회원 등록 정보 입력"/>
+    <EditText
+        android:id="@+id/edittext_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="아이디*"/>
+    <EditText
+        android:id="@+id/edittext_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="비밀번호*"/>
+    <EditText
+        android:id="@+id/edittext_password2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="비밀번호(재입력)*"/>
+    <EditText
+        android:id="@+id/edittext_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="email 주소*"/>
+    <Button
+        android:id="@+id/button_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:text="입력 내용 확인"/>
+
+</LinearLayout>
+
+
+public class ConfirmActivity extends AppCompatActivity {
+    TextView textview_confirm_display;
+    Button button_modify, button_license;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_confirm);
+
+        textview_confirm_display=findViewById(R.id.textview_confirm_display);
+        button_modify=findViewById(R.id.button_modify);
+        button_license=findViewById(R.id.button_license);
+
+        Intent intent=getIntent();
+        String s="아이디: "+intent.getStringExtra("ID")+"\n메일주소: "+intent.getStringExtra("EMAIL");
+        textview_confirm_display.setText(s);
+
+        button_modify.setOnClickListener(v->{
+            finish();
+        });
+        button_license.setOnClickListener(v->{
+            Intent i=new Intent(getApplicationContext(), AgreementActivity.class);
+            startActivity(i);
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="40dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20sp"
+        android:text="회원 등록 내용 확인"/>
+    <TextView
+        android:id="@+id/textview_confirm_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/button_modify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_margin="10dp"
+            android:text="수정"/>
+        <Button
+            android:id="@+id/button_license"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_margin="10dp"
+            android:text="다음"/>
+    </LinearLayout>
+</LinearLayout>
+
+
+public class AgreementActivity extends AppCompatActivity {
+    Button button_execute_registration;
+    CheckBox checkbox_license_agreement;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_agreement);
+
+        button_execute_registration=findViewById(R.id.button_execute_registration);
+        button_execute_registration.setEnabled(false);
+        checkbox_license_agreement=findViewById(R.id.checkbox_license_agreement);
+
+        checkbox_license_agreement.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                button_execute_registration.setEnabled(isChecked);
+            }
+        });
+        button_execute_registration.setOnClickListener(v->{
+            Intent intent=new Intent(getApplicationContext(), NoticeActivity.class);
+            startActivity(intent);
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="40dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20sp"
+        android:text="개인 정보 수집 및 이용 동의"/>
+    <TextView
+        android:id="@+id/textview_confirm_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="회원제 서비스 운영을 위해 입력하신 개인정보(아이디, 비밀번호, 메일주소)를 수집 및 이용합니다. 동의를 거부하실 경우 회원제 서비스이용이 불가합니다."
+        android:padding="20dp"/>
+    <CheckBox
+        android:id="@+id/checkbox_license_agreement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="개인정보(아이디, 비밀번호, 메일주소)의 수집 및 이용에 동의합니다"/>
+    <Button
+        android:id="@+id/button_execute_registration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:text="회원등록"/>
+</LinearLayout>
+
+
+public class NoticeActivity extends AppCompatActivity {
+    Button button_home;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notice);
+        button_home=findViewById(R.id.button_home);
+        button_home.setOnClickListener(v->{
+            Intent intent=new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="40dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20sp"
+        android:text="회원 등록 완료"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="회원 등록이 완료되었습니다"
+        android:padding="20dp"/>
+    <Button
+        android:id="@+id/button_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:text="홈으로"/>
+</LinearLayout>

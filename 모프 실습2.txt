@@ -1,0 +1,514 @@
+004_사용자인터페이스기초1, 실습7
+
+
+-----
+실습 7
+-----
+
+public class MainActivity extends AppCompatActivity {
+    Spinner spinner;
+    EditText edittext;
+    RadioButton radiobutton_g, radiobutton_s;
+    CheckBox checkbox_w, checkbox_c;
+    Button button;
+    TextView textview;
+    String destination[]={"서울", "부산", "대전", "대구", "경주"};
+    String s="";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        spinner=findViewById(R.id.spinner);
+        edittext=findViewById(R.id.edittext);
+        radiobutton_g=findViewById(R.id.radiobutton_g);
+        radiobutton_s=findViewById(R.id.radiobutton_s);
+        checkbox_w=findViewById(R.id.checkbox_w);
+        checkbox_c=findViewById(R.id.checkbox_c);
+        button=findViewById(R.id.button);
+        textview=findViewById(R.id.textview);
+
+        button.setOnClickListener(v->button_job());
+        radiobutton_g.setOnCheckedChangeListener((v,i)->display());
+        radiobutton_s.setOnCheckedChangeListener((v,i)->display());
+        checkbox_c.setOnCheckedChangeListener((v,i)->display());
+        checkbox_w.setOnCheckedChangeListener((v,i)->display());
+
+        edittext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                display();
+            }
+        });
+
+        ArrayAdapter adapter=new ArrayAdapter(this, android.R.layout.simple_spinner_item, destination);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                display();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        radiobutton_g.setChecked(true);
+    }
+
+    private void button_job() {
+        Toast.makeText(this, "제출: "+s, Toast.LENGTH_LONG).show();
+    }
+
+    private void display() {
+        s="목적지: "+spinner.getSelectedItem().toString();
+        s+="\n승차인원: "+edittext.getText().toString()+"(명)";
+        s+="\n좌석: "+(radiobutton_g.isChecked()? "일반실" : "특실");
+        if(checkbox_w.isChecked()) s+="\n창측 선호";
+        if(checkbox_c.isChecked()) s+="\n복도측 선호";
+        textview.setText(s);
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:gravity="center_horizontal"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="20sp"
+        android:text="기차표 예약"/>
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Spinner.Underlined"/>
+    <EditText
+        android:id="@+id/edittext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="인원수"/>
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/radiobutton_g"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="일반실"/>
+        <RadioButton
+            android:id="@+id/radiobutton_s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="특실"/>
+    </RadioGroup>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <CheckBox
+            android:id="@+id/checkbox_w"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="창측 선호"/>
+        <CheckBox
+            android:id="@+id/checkbox_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="복도측 선호"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/textview"
+        android:background="#D7E88A"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="제출"/>
+</LinearLayout>
+
+
+
+
+
+
+-------------
+실습 7 (noXML)
+-------------
+public class MainActivity extends AppCompatActivity {
+    Spinner spinner;
+    EditText edittext;
+    RadioButton radiobutton_g, radiobutton_s;
+    CheckBox checkbox_w, checkbox_c;
+    TextView textview_display;
+    String s="";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        int px=dp2px(20);
+
+        LinearLayout ll=new LinearLayout(this);
+        ll.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setGravity(Gravity.CENTER_HORIZONTAL);
+        ll.setPadding(px, px, px, px);
+
+        TextView textview_title=new TextView(this);
+        textview_title.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        textview_title.setText("기차표 예약");
+        textview_title.setTextSize(20);
+        textview_title.setPadding(px, px, px, px);
+
+        spinner=new Spinner(this);
+        spinner.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        String city[]={"서울", "부산", "대구", "경주"};
+        ArrayAdapter adapter=new ArrayAdapter(this, android.R.layout.simple_spinner_item, city);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        edittext=new EditText(this);
+        edittext.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        edittext.setHint("인원수");
+        edittext.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        RadioGroup radiogroup=new RadioGroup(this);
+        radiogroup.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        radiogroup.setOrientation(LinearLayout.HORIZONTAL);
+        radiobutton_g=new RadioButton(this);
+        radiobutton_g.setText("일반실");
+        radiobutton_s=new RadioButton(this);
+        radiobutton_s.setText("특실");
+        radiogroup.addView(radiobutton_g);
+        radiogroup.addView(radiobutton_s);
+        radiobutton_g.setChecked(true);
+
+        LinearLayout ll2=new LinearLayout(this);
+        ll2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        checkbox_w=new CheckBox(this);
+        checkbox_w.setText("창측 선호");
+        checkbox_c=new CheckBox(this);
+        checkbox_c.setText("복도측 선호");
+        ll2.addView(checkbox_w);
+        ll2.addView(checkbox_c);
+
+        textview_display=new TextView(this);
+        textview_display.setPadding(px, px, px, px);
+        textview_display.setBackgroundColor(Color.parseColor("#D7E88A"));
+        textview_display.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        Button button=new Button(this);
+        button.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        button.setText("제출");
+
+        ll.addView(textview_title);
+        ll.addView(spinner);
+        ll.addView(edittext);
+        ll.addView(radiogroup);
+        ll.addView(ll2);
+        ll.addView(textview_display);
+        ll.addView(button);
+        setContentView(ll);
+
+        button.setOnClickListener(v->button_job());
+
+        radiobutton_g.setOnCheckedChangeListener((v,i)->display());
+        radiobutton_s.setOnCheckedChangeListener((v,i)->display());
+        checkbox_c.setOnCheckedChangeListener((v,i)->display());
+        checkbox_w.setOnCheckedChangeListener((v,i)->display());
+
+        edittext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                display();
+            }
+        });
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                display();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+    }
+    private void button_job() {
+        Toast.makeText(this, "제출: "+s, Toast.LENGTH_LONG).show();
+    }
+
+    private void display() {
+        s="목적지: "+spinner.getSelectedItem().toString();
+        s+="\n승차인원: "+edittext.getText().toString()+"(명)";
+        s+="\n좌석: "+(radiobutton_g.isChecked()? "일반실" : "특실");
+        if(checkbox_w.isChecked()) s+="\n창측 선호";
+        if(checkbox_c.isChecked()) s+="\n복도측 선호";
+        textview_display.setText(s);
+    }
+
+    private int dp2px(int dp) {
+        return (int) (getResources().getDisplayMetrics().density*dp+0.5);
+    }
+}
+
+
+------------------------------------
+004_사용자인터페이스기초2 (실습8, inflation)
+------------------------------------
+
+public class MainActivity extends AppCompatActivity {
+    LinearLayout ll, ll1, ll2;
+    RadioButton radiobutton_m, radiobutton_p;
+    EditText edittext;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Button button=findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!radiobutton_m.isChecked() && !radiobutton_p.isChecked()){
+                    Toast.makeText(MainActivity.this, "수신 방식 필수 선택", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        ll=findViewById(R.id.ll);
+        ll1= (LinearLayout) getLayoutInflater().inflate(R.layout.display1, null);
+        ll2= (LinearLayout) getLayoutInflater().inflate(R.layout.display2, null);
+        edittext=ll1.findViewById(R.id.edittext);
+        radiobutton_m=findViewById(R.id.radiobutton_m);
+        radiobutton_p=findViewById(R.id.radiobutton_p);
+        radiobutton_m.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked) return;
+                ll.removeView(ll2);
+                ll.addView(ll1,1);
+                edittext.requestFocus();
+                InputMethodManager imm= (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(edittext, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+        radiobutton_p.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked) return;
+                ll.removeView(ll1);
+                ll.addView(ll2, 1);
+                RadioButton radiobutton_h=ll2.findViewById(R.id.radiobutton_h);
+                radiobutton_h.setChecked(true);
+            }
+        });
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    android:id="@+id/ll"
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:gravity="center_horizontal"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/radiobutton_m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메일 수신"/>
+        <RadioButton
+            android:id="@+id/radiobutton_p"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="우편 수신"/>
+    </RadioGroup>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="제출"/>
+</LinearLayout>
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    android:id="@+id/ll1"
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="메일 주소"
+        android:inputType="textEmailAddress"/>
+</LinearLayout>
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    android:id="@+id/ll2"
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:padding="20dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#DDDDB6"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/radiobutton_h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="자택 주소"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="직장 주소"/>
+    </RadioGroup>
+</LinearLayout>
+
+
+
+------------------------------------
+004_사용자인터페이스기초2 (실습8, visibility)
+------------------------------------
+public class MainActivity extends AppCompatActivity {
+    RadioButton radiobutton_m, radiobutton_p, radiobutton_h;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Button button=findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!radiobutton_m.isChecked() && !radiobutton_p.isChecked()){
+                    Toast.makeText(MainActivity.this, "수신 방식 필수 선택", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        LinearLayout ll1=findViewById(R.id.ll1);
+        LinearLayout ll2=findViewById(R.id.ll2);
+        EditText edittext=ll1.findViewById(R.id.edittext);
+        radiobutton_h=findViewById(R.id.radiobutton_h);
+        radiobutton_m=findViewById(R.id.radiobutton_m);
+        radiobutton_p=findViewById(R.id.radiobutton_p);
+        radiobutton_h.setChecked(true);
+        radiobutton_m.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked) return;
+                ll1.setVisibility(View.VISIBLE);
+                ll2.setVisibility(View.GONE);
+                edittext.requestFocus();
+                InputMethodManager imm= (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(edittext, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+        radiobutton_p.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked) return;
+                ll2.setVisibility(View.VISIBLE);
+                ll1.setVisibility(View.GONE);
+            }
+        });
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:gravity="center_horizontal"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/radiobutton_m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메일 수신"/>
+        <RadioButton
+            android:id="@+id/radiobutton_p"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="우편 수신"/>
+    </RadioGroup>
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:visibility="gone"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="메일 주소"
+            android:inputType="textEmailAddress"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll2"
+        android:visibility="gone"
+        android:padding="20dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDB6"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radiobutton_h"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="자택 주소"/>
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="직장 주소"/>
+        </RadioGroup>
+    </LinearLayout>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="제출"/>
+</LinearLayout>

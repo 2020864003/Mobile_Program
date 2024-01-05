@@ -1,0 +1,167 @@
+실습-삭제버튼구현(리스트뷰-어댑터-DB커서 연동)
+
+public class MainActivity extends AppCompatActivity {
+    DBHelper dbHelper=new DBHelper(this);
+    EditText edittext_memo;
+    Button button_save, button_read;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        edittext_memo=findViewById(R.id.edittext_memo);
+        button_read=findViewById(R.id.button_read);
+        button_save=findViewById(R.id.button_save);
+        button_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbHelper.insert(edittext_memo.getText().toString());
+            }
+        });
+        button_read.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(), Activity_List.class);
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="메모"
+        android:textSize="20sp"/>
+    <EditText android:id="@+id/edittext_memo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"/>
+    <Button android:id="@+id/button_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="저장"
+        android:textSize="15sp"/>
+    <Button android:id="@+id/button_read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="메모 보기"
+        android:textSize="15sp"/>
+</LinearLayout>
+
+
+public class Activity_List extends AppCompatActivity {
+    DBHelper dbHelper=new DBHelper(this);
+    String rowid;
+    ListView listview;
+    Button button_delete;
+    MyAdapter adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_list);
+        listview = findViewById(R.id.listview);
+        listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                rowid=view.getTag().toString();
+                button_delete.setEnabled(true);
+            }
+        });
+
+        button_delete=findViewById(R.id.button_delete);
+        button_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbHelper.delete(rowid);
+                button_delete.setEnabled(false);
+                rowid=null;
+                listview_show();
+            }
+        });
+        button_delete.setEnabled(false);
+
+        listview_show();
+    }
+
+    private void listview_show() {
+        SQLiteDatabase db=dbHelper.getReadableDatabase();
+        Cursor cursor=db.rawQuery("SELECT rowid, memo FROM TB_memo", null);
+        if(adapter==null){
+            adapter=new MyAdapter(this, cursor);
+            listview.setAdapter(adapter);
+        }
+        else {
+            adapter.setCursor(cursor);
+            adapter.notifyDataSetChanged();
+        }
+    }
+}
+
+
+class MyAdapter extends BaseAdapter {
+    LayoutInflater inflater;
+    Cursor cursor;
+    public MyAdapter(Context context, Cursor cursor) {
+        this.inflater= LayoutInflater.from(context);
+        this.cursor=cursor;
+    }
+    @Override
+    public int getCount() {
+        return cursor.getCount();
+    }
+    @Override
+    public Object getItem(int position) {
+        cursor.moveToPosition(position);
+        return cursor.getString(1);
+    }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(convertView==null) convertView=inflater.inflate(android.R.layout.simple_list_item_single_choice, parent, false);
+        TextView textview=convertView.findViewById(android.R.id.text1);
+        cursor.moveToPosition(position);
+        textview.setText(cursor.getString(1));
+        textview.setTag(cursor.getString(0));
+        return convertView;
+    }
+    public void setCursor(Cursor cursor) {
+        this.cursor=cursor;
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <Button
+            android:id="@+id/button_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            android:textSize="15sp"/>
+    </LinearLayout>
+</LinearLayout>

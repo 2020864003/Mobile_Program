@@ -1,0 +1,286 @@
+(1) 강의자료실에 있는 4개 도형 이미지들을 drawable 폴더에 s1.png, s2.png, s3.png, s4.png의 이름으로 복사 필요
+
+--------------------------
+007_리스트뷰 (실습-리스트뷰(사이트목록리스트뷰및이동))
+--------------------------
+public class MainActivity extends AppCompatActivity {
+    Button button_start;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        button_start=findViewById(R.id.button_start);
+        button_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ListActivity.class));
+            }
+        });
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:padding="30dp">
+    <Button
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="시작"
+        style="@style/Widget.AppCompat.Button.Small"/>
+</LinearLayout>
+
+
+public class ListActivity extends AppCompatActivity {
+    ListView listview;
+    Button button_home;
+    String siteName[]={"질병관리청", "부산시청", "전자정부"};
+    String siteUrl[]={"https://kdca.go.kr&quot;, "https://www.busan.go.kr&quot;, "https://www.gov.kr&quot;};
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_list);
+
+        button_home=findViewById(R.id.button_home);
+        button_home.setOnClickListener(v->{
+            Intent intent=new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+//            finish();
+        });
+        listview=findViewById(R.id.listview);
+        ArrayAdapter adapter=new ArrayAdapter(this, android.R.layout.simple_list_item_1, siteName);
+        listview.setAdapter(adapter);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(siteUrl[position]));
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/button_home"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="홈으로"/>
+</LinearLayout>
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools="http://schemas.android.com/tools&quot;
+    package="com.example.test" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Test"
+        tools:targetApi="31" >
+        <activity
+            android:name=".ListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+
+--------------------------
+007_리스트뷰 (실습-리스트뷰(커스텀어댑터-도형이미지))
+--------------------------
+public class MainActivity extends AppCompatActivity {
+    ListView listview;
+    String shapeName[]={"직육면체", "원기둥", "원", "삼각형"};
+    int imageId[]={R.drawable.s1, R.drawable.s2, R.drawable.s3, R.drawable.s4};
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        listview=findViewById(R.id.listview);
+        MyAdapter adapter=new MyAdapter(this, shapeName, imageId);
+        listview.setAdapter(adapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(getApplicationContext(), ShowImageActivity.class);
+                intent.putExtra("ImageName", shapeName[position]);
+                intent.putExtra("ImageResId", imageId[position]);
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android;
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+
+
+public class MyAdapter extends BaseAdapter {
+    private final LayoutInflater inflater;
+    private final int[] imageId;
+    Context context;
+    String shapeName[];
+    public MyAdapter(Context context, String[] shapeName, int[] imageId) {
+        this.context=context;
+        this.shapeName=shapeName;
+        this.imageId=imageId;
+        this.inflater=LayoutInflater.from(context);
+    }
+    @Override
+    public int getCount() {
+        return shapeName.length;
+    }
+    @Override
+    public Object getItem(int position) {
+        return shapeName[position];
+    }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(convertView==null) convertView=inflater.inflate(R.layout.listitem, parent, false);
+        ImageView listitem_imageview=convertView.findViewById(R.id.listitem_imageview);
+        TextView listitem_textview=convertView.findViewById(R.id.listitem_textview);
+        listitem_textview.setText(shapeName[position]);
+        listitem_imageview.setImageResource(imageId[position]);
+        return convertView;
+    }
+
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:orientation="horizontal"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/listitem_imageview"
+        android:padding="10dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
+    <TextView
+        android:id="@+id/listitem_textview"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+
+
+public class ShowImageActivity extends AppCompatActivity {
+    ImageView showimage_imageview;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_show_image);
+
+        Intent intent=getIntent();
+        setTitle(intent.getStringExtra("ImageName"));
+
+        showimage_imageview=findViewById(R.id.showimage_imageview);
+        showimage_imageview.setImageResource(getIntent().getIntExtra("ImageResId", 0));
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    android:padding="40dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/showimage_imageview"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+</LinearLayout>
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android&quot;
+    xmlns:tools="http://schemas.android.com/tools&quot;
+    package="com.example.test">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Test"
+        tools:targetApi="31">
+        <activity
+            android:name=".ShowImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
